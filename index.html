@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>長文読解テスト</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="settingScreen" class="screen">
+    <h1>設定</h1>
+
+    <input
+      id="nameInput"
+      type="text"
+      placeholder="名前を入力"
+      autocomplete="off"
+    >
+
+    <button id="goStartBtn">次へ</button>
+  </div>
+
+  <div id="startScreen" class="screen" style="display: none;">
+    <h1>長文読解</h1>
+    <button id="startBtn">スタート</button>
+  </div>
+
+  <div id="passageScreen" class="screen" style="display: none;">
+    <h1>本文</h1>
+
+    <div id="passageBox">
+      <p id="passageText"></p>
+    </div>
+
+    <button id="goQuestionBtn">問題へ進む</button>
+  </div>
+
+  <div id="testScreen" class="screen" style="display: none;">
+    <div id="testLayout">
+
+      <div id="testPassageBox">
+        <h2>本文</h2>
+        <p id="testPassageText"></p>
+      </div>
+
+      <div id="questionArea">
+        <div id="progressText"></div>
+
+        <div id="questionCard">
+          <div id="question"></div>
+          <div id="choiceArea"></div>
+        </div>
+
+        <input
+          id="answerInput"
+          type="text"
+          autocomplete="off"
+          placeholder="答えを入力"
+        >
+
+        <button id="nextBtn">次へ</button>
+
+        <div id="submitArea" style="display: none;">
+          <button id="sendBtn">送信</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
