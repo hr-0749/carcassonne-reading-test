@@ -29,11 +29,13 @@
   <div id="passageScreen" class="screen" style="display: none;">
     <h1>本文</h1>
 
+    <p id="passageNotice">
+      本文を読んでください。5分後に自動で問題画面へ進みます。
+    </p>
+
     <div id="passageBox">
       <p id="passageText"></p>
     </div>
-
-    <button id="goQuestionBtn">問題へ進む</button>
   </div>
 
   <div id="testScreen" class="screen" style="display: none;">
@@ -51,6 +53,8 @@
           <div id="question"></div>
           <div id="choiceArea"></div>
         </div>
+
+        <div id="multiAnswerArea" style="display: none;"></div>
 
         <input
           id="answerInput"
