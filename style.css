@@ -76,10 +76,22 @@ button:disabled {
   margin-bottom: 24px;
 }
 
+#passageNotice {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto 16px;
+  padding: 12px 16px;
+  background-color: #ffffff;
+  border: 2px solid #cccccc;
+  border-radius: 10px;
+  font-size: 18px;
+  line-height: 1.6;
+}
+
 #passageBox {
   width: 100%;
   max-width: 760px;
-  max-height: 60vh;
+  max-height: 68vh;
   overflow-y: auto;
   margin: 0 auto;
   padding: 24px;
@@ -176,6 +188,30 @@ button:disabled {
   border-color: #3366cc;
 }
 
+#multiAnswerArea {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.multiAnswerField {
+  width: 100%;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.multiAnswerLabel {
+  display: block;
+  font-size: 18px;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+
+.multiAnswerInput {
+  width: 100%;
+  max-width: 100%;
+}
+
 #submitArea {
   margin-top: 20px;
 }
@@ -219,8 +255,14 @@ button:disabled {
     margin-top: 22px;
   }
 
+  #passageNotice {
+    font-size: 15px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+  }
+
   #passageBox {
-    max-height: 68vh;
+    max-height: 70vh;
     padding: 18px;
     font-size: 17px;
     line-height: 1.75;
@@ -271,6 +313,14 @@ button:disabled {
     margin-top: 10px;
   }
 
+  #multiAnswerArea {
+    max-width: 100%;
+  }
+
+  .multiAnswerLabel {
+    font-size: 16px;
+  }
+
   #submitArea {
     margin-top: 10px;
   }
@@ -284,6 +334,10 @@ button:disabled {
 
   h1 {
     font-size: 28px;
+  }
+
+  #passageNotice {
+    font-size: 14px;
   }
 
   #passageBox {
@@ -311,5 +365,9 @@ button:disabled {
 
   button {
     font-size: 19px;
+  }
+
+  .multiAnswerLabel {
+    font-size: 15px;
   }
 }
