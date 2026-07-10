@@ -1,6 +1,6 @@
 const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyol21K7nF7oQYlGAUgOGF4hUqQ5ygeCfCMoD3ypjjv_GEYMdxV5FJmZTJBdWLvdcKH-w/exec";
 
-const PASSAGE_READING_TIME_MS = 3 * 60 * 1000;
+const PASSAGE_READING_TIME_MS = 3 * 1000;
 
 const passage = `フランス南部にあるカルカソンヌ城塞都市は、ヨーロッパでも特に保存状態のよい中世の城塞都市として知られている。現在のカルカソンヌには、約3kmにおよぶ城壁と52の塔が残されており、外側と内側の二重の城壁が町を取り囲んでいる。このような構造は、単に町の周囲を石で囲んだだけのものではない。敵が外側の城壁を突破したとしても、すぐに町の中心部へ入れるわけではなく、内側の城壁との間で動きを制限される。つまり、カルカソンヌの防御は「一度防ぐ」ためだけではなく、「突破された後も敵を遅らせ、混乱させる」ことを考えた仕組みであった。
 
