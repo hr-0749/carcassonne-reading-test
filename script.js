@@ -268,6 +268,7 @@ const questions = [
 const totalQuestions = questions.length;
 
 let progressMode = "text";
+let progressModeLabel = "回答数を表示";
 let currentIndex = 0;
 let startTime = null;
 let results = [];
@@ -314,6 +315,23 @@ const sendBtn = document.getElementById("sendBtn");
 const circleRadius = 45;
 const circleLength = 2 * Math.PI * circleRadius;
 
+function getProgressModeLabel(mode) {
+  const labels = {
+    none: "回答数を表示しない",
+    text: "回答数を表示",
+    bar: "バーで表示",
+    both: "回答数とバーの両方",
+    circle: "回転バーで表示",
+    circleBoth: "回答数と回転バーの両方"
+  };
+
+  return labels[mode] || mode;
+}
+
+function roundSecFromMs(ms) {
+  return Number((ms / 1000).toFixed(3));
+}
+
 function goToStartScreen() {
   participantName = nameInput.value.trim();
 
@@ -323,6 +341,7 @@ function goToStartScreen() {
   }
 
   progressMode = progressModeSelect.value;
+  progressModeLabel = getProgressModeLabel(progressMode);
 
   settingScreen.style.display = "none";
   startScreen.style.display = "flex";
@@ -653,7 +672,7 @@ function nextQuestion() {
     userAnswer: userAnswer,
     isCorrect: correct,
     timeMs: Math.round(elapsedTime),
-    timeSec: (elapsedTime / 1000).toFixed(3),
+    timeSec: roundSecFromMs(elapsedTime),
     backspaceCount: backspaceCount
   });
 
@@ -692,9 +711,21 @@ function finishTest() {
   sendResultsToSpreadsheet();
 }
 
+function countCorrect(targetResults) {
+  return targetResults.filter(result => result.isCorrect).length;
+}
+
+function sumTimeMs(targetResults) {
+  return targetResults.reduce((sum, result) => {
+    return sum + result.timeMs;
+  }, 0);
+}
+
 function createOneRowResult() {
   const oneRowResult = {
-    name: participantName
+    name: participantName,
+    progressMode: progressMode,
+    progressModeLabel: progressModeLabel
   };
 
   for (let i = 0; i < totalQuestions; i++) {
@@ -704,10 +735,26 @@ function createOneRowResult() {
     oneRowResult[`q${i + 1}Correct`] = result
       ? (result.isCorrect ? "正" : "誤")
       : "";
+    oneRowResult[`q${i + 1}TimeSec`] = result
+      ? roundSecFromMs(result.timeMs)
+      : "";
   }
 
-  const correctCount = results.filter(result => result.isCorrect).length;
-  oneRowResult.correctCount = correctCount;
+  const firstHalfResults = results.slice(0, 5);
+  const secondHalfResults = results.slice(5, 10);
+
+  const totalAnswerTimeMs = sumTimeMs(results);
+  const firstHalfAnswerTimeMs = sumTimeMs(firstHalfResults);
+  const secondHalfAnswerTimeMs = sumTimeMs(secondHalfResults);
+
+  oneRowResult.correctCount = countCorrect(results);
+  oneRowResult.totalAnswerTimeSec = roundSecFromMs(totalAnswerTimeMs);
+
+  oneRowResult.firstHalfCorrectCount = countCorrect(firstHalfResults);
+  oneRowResult.secondHalfCorrectCount = countCorrect(secondHalfResults);
+
+  oneRowResult.firstHalfAnswerTimeSec = roundSecFromMs(firstHalfAnswerTimeMs);
+  oneRowResult.secondHalfAnswerTimeSec = roundSecFromMs(secondHalfAnswerTimeMs);
 
   return oneRowResult;
 }
@@ -751,19 +798,37 @@ function escapeCSV(value) {
 function downloadCSV() {
   const oneRowResult = createOneRowResult();
 
-  let headers = ["名前"];
-  let values = [`"${escapeCSV(oneRowResult.name)}"`];
+  let headers = [
+    "名前",
+    "進捗表示条件",
+    "正解数",
+    "合計回答時間_秒",
+    "前半正解数",
+    "後半正解数",
+    "前半回答時間_秒",
+    "後半回答時間_秒"
+  ];
+
+  let values = [
+    `"${escapeCSV(oneRowResult.name)}"`,
+    `"${escapeCSV(oneRowResult.progressModeLabel)}"`,
+    oneRowResult.correctCount,
+    oneRowResult.totalAnswerTimeSec,
+    oneRowResult.firstHalfCorrectCount,
+    oneRowResult.secondHalfCorrectCount,
+    oneRowResult.firstHalfAnswerTimeSec,
+    oneRowResult.secondHalfAnswerTimeSec
+  ];
 
   for (let i = 1; i <= totalQuestions; i++) {
     headers.push(`${i}問目の回答`);
     headers.push(`${i}問目の正誤`);
+    headers.push(`${i}問目の回答時間_秒`);
 
     values.push(`"${escapeCSV(oneRowResult[`q${i}Answer`])}"`);
     values.push(`"${escapeCSV(oneRowResult[`q${i}Correct`])}"`);
+    values.push(oneRowResult[`q${i}TimeSec`]);
   }
-
-  headers.push("正解数");
-  values.push(oneRowResult.correctCount);
 
   const csv =
     headers.join(",") +
