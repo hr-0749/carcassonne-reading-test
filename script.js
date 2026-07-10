@@ -267,6 +267,7 @@ const questions = [
 
 const totalQuestions = questions.length;
 
+let progressMode = "text";
 let currentIndex = 0;
 let startTime = null;
 let results = [];
@@ -284,6 +285,7 @@ const passageScreen = document.getElementById("passageScreen");
 const testScreen = document.getElementById("testScreen");
 
 const nameInput = document.getElementById("nameInput");
+const progressModeSelect = document.getElementById("progressModeSelect");
 const goStartBtn = document.getElementById("goStartBtn");
 
 const startBtn = document.getElementById("startBtn");
@@ -294,6 +296,12 @@ const testPassageText = document.getElementById("testPassageText");
 
 const progressText = document.getElementById("progressText");
 
+const progressBarWrap = document.getElementById("progressBarWrap");
+const progressBar = document.getElementById("progressBar");
+
+const circleProgressWrap = document.getElementById("circleProgressWrap");
+const circleFg = document.getElementById("circleFg");
+
 const questionEl = document.getElementById("question");
 const choiceArea = document.getElementById("choiceArea");
 const multiAnswerArea = document.getElementById("multiAnswerArea");
@@ -303,6 +311,9 @@ const nextBtn = document.getElementById("nextBtn");
 const submitArea = document.getElementById("submitArea");
 const sendBtn = document.getElementById("sendBtn");
 
+const circleRadius = 45;
+const circleLength = 2 * Math.PI * circleRadius;
+
 function goToStartScreen() {
   participantName = nameInput.value.trim();
 
@@ -311,8 +322,10 @@ function goToStartScreen() {
     return;
   }
 
+  progressMode = progressModeSelect.value;
+
   settingScreen.style.display = "none";
-  startScreen.style.display = "block";
+  startScreen.style.display = "flex";
 }
 
 function startTest() {
@@ -497,8 +510,32 @@ function renderMultiInputs(inputFields) {
 
 function updateProgress() {
   const answeredCount = currentIndex;
+  const percent = answeredCount / totalQuestions;
+
   progressText.textContent = `回答数：${answeredCount} / ${totalQuestions}`;
-  progressText.style.display = "block";
+
+  progressBar.style.width = `${percent * 100}%`;
+
+  circleFg.style.strokeDasharray = circleLength;
+  circleFg.style.strokeDashoffset = circleLength * (1 - percent);
+
+  progressText.style.display = "none";
+  progressBarWrap.style.display = "none";
+  circleProgressWrap.style.display = "none";
+
+  if (progressMode === "text") {
+    progressText.style.display = "block";
+  } else if (progressMode === "bar") {
+    progressBarWrap.style.display = "block";
+  } else if (progressMode === "both") {
+    progressText.style.display = "block";
+    progressBarWrap.style.display = "block";
+  } else if (progressMode === "circle") {
+    circleProgressWrap.style.display = "block";
+  } else if (progressMode === "circleBoth") {
+    progressText.style.display = "block";
+    circleProgressWrap.style.display = "block";
+  }
 }
 
 function toHalfWidth(value) {
