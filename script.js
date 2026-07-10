@@ -1,5 +1,7 @@
 const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyol21K7nF7oQYlGAUgOGF4hUqQ5ygeCfCMoD3ypjjv_GEYMdxV5FJmZTJBdWLvdcKH-w/exec";
 
+const PASSAGE_READING_TIME_MS = 5 * 1000;
+
 const passage = `フランス南部にあるカルカソンヌ城塞都市は、ヨーロッパでも特に保存状態のよい中世の城塞都市として知られている。現在のカルカソンヌには、約3kmにおよぶ城壁と52の塔が残されており、外側と内側の二重の城壁が町を取り囲んでいる。このような構造は、単に町の周囲を石で囲んだだけのものではない。敵が外側の城壁を突破したとしても、すぐに町の中心部へ入れるわけではなく、内側の城壁との間で動きを制限される。つまり、カルカソンヌの防御は「一度防ぐ」ためだけではなく、「突破された後も敵を遅らせ、混乱させる」ことを考えた仕組みであった。
 
 カルカソンヌが重要な場所となった理由の一つは、その立地にある。この地域は、地中海方面と大西洋方面を結ぶ道、またピレネー山脈方面とフランス内陸部をつなぐ道に近かった。そのため、カルカソンヌは軍事的な拠点であると同時に、人や物資が行き交う交通上の要地でもあった。城塞都市を守ることは、そこに住む人々を守るだけでなく、周辺地域の支配や交易路の管理にもつながっていた。
@@ -130,48 +132,56 @@ const questions = [
     answerAliases: ["2", "２"]
   },
   {
-    type: "input",
+    type: "choice",
     questionText: `問6　正誤判断
 
-次の文が本文の内容と合っていれば「正」、合っていなければ「誤」と答えなさい。
-
-A. カルカソンヌの防御は、敵を一度防ぐだけでなく、侵入後も動きを遅らせることを考えていた。
-B. カルカソンヌは、交通路とは関係のない孤立した山奥に作られた。
-C. 城壁は外敵への防御だけでなく、支配者の力を示す役割も持っていた。
-D. 現在見られるカルカソンヌの姿には、19世紀の修復の影響も含まれている。
-
-入力例：正誤正正`,
-    inputPlaceholder: "例：正誤正正",
-    correctAnswer: "正誤正正",
-    answerAliases: [
-      "正誤正正",
-      "A正B誤C正D正",
-      "A:正B:誤C:正D:正",
-      "A：正B：誤C：正D：正"
-    ]
+本文の内容と誤っているものを選びなさい。`,
+    choices: [
+      {
+        label: "カルカソンヌの防御は、敵を一度防ぐだけでなく、侵入後も動きを遅らせることを考えていた。",
+        value: "1"
+      },
+      {
+        label: "カルカソンヌは、交通路とは関係のない孤立した山奥に作られた。",
+        value: "2"
+      },
+      {
+        label: "城壁は外敵への防御だけでなく、支配者の力を示す役割も持っていた。",
+        value: "3"
+      },
+      {
+        label: "現在見られるカルカソンヌの姿には、19世紀の修復の影響も含まれている。",
+        value: "4"
+      }
+    ],
+    correctAnswer: "2",
+    answerAliases: ["2", "２"]
   },
   {
-    type: "input",
-    questionText: `問7　並べ替え
+    type: "choice",
+    questionText: `問7　並び変え問題
 
-本文の流れに合うように、次の内容を古い順に並べなさい。
-
-A. 19世紀にヴィオレ＝ル＝デュクらによる修復が行われた。
-B. 古代ローマ時代から防御拠点として使われた。
-C. 現在は世界遺産として保護され、多くの観光客が訪れている。
-D. 13世紀ごろにフランス王権と関わる重要な拠点として防御機能が強化された。
-
-入力例：BDAC`,
-    inputPlaceholder: "例：BDAC",
-    correctAnswer: "BDAC",
-    answerAliases: [
-      "BDAC",
-      "B→D→A→C",
-      "B>D>A>C",
-      "B,D,A,C",
-      "B D A C",
-      "ＢＤＡＣ"
-    ]
+本文の流れに合うように、次の内容を古い順に並べ変えたとき、３番目に来るものを選びなさい。`,
+    choices: [
+      {
+        label: "ヴィオレ＝ル＝デュクらによる修復が行われた。",
+        value: "1"
+      },
+      {
+        label: "防御拠点として使われた。",
+        value: "2"
+      },
+      {
+        label: "世界遺産として保護され、多くの観光客が訪れた。",
+        value: "3"
+      },
+      {
+        label: "フランス王権と関わる重要な拠点として防御機能が強化された。",
+        value: "4"
+      }
+    ],
+    correctAnswer: "1",
+    answerAliases: ["1", "１"]
   },
   {
     type: "choice",
@@ -201,16 +211,24 @@ D. 13世紀ごろにフランス王権と関わる重要な拠点として防御
     answerAliases: ["1", "１"]
   },
   {
-    type: "input",
+    type: "multiInput",
+    multiInputMode: "ordered",
     questionText: `問9　語句抜き出し
 
 19世紀の修復によって、カルカソンヌは中世城塞都市らしい姿を取り戻した。
 一方で、現在見られる姿について、本文ではどの2つを区別することが問題になったと述べられているか。
 本文中から、4字と14字でそれぞれ抜き出しなさい。
-※数字も1字として数える。
-
-入力例：中世の姿、19世紀の人々が考えた中世像`,
-    inputPlaceholder: "4字と14字を入力",
+※数字も1字として数える。`,
+    inputFields: [
+      {
+        label: "4字の語句",
+        placeholder: "4字の語句を入力"
+      },
+      {
+        label: "14字の語句",
+        placeholder: "14字の語句を入力"
+      }
+    ],
     correctAnswer: "中世の姿、19世紀の人々が考えた中世像",
     expectedParts: [
       "中世の姿",
@@ -218,14 +236,26 @@ D. 13世紀ごろにフランス王権と関わる重要な拠点として防御
     ]
   },
   {
-    type: "input",
+    type: "multiInput",
+    multiInputMode: "unordered",
     questionText: `問10　語句抜き出し
 
 現在のカルカソンヌでは、多くの観光客が訪れることで、いくつかの要素のバランスを取る必要があると述べられている。
-本文中から、その3つの要素をそれぞれ5字で抜き出しなさい。
-
-入力例：住民の生活、建物の保存、観光施設化`,
-    inputPlaceholder: "3つの要素を入力",
+本文中から、その3つの要素をそれぞれ5字で抜き出しなさい。`,
+    inputFields: [
+      {
+        label: "1つ目の語句",
+        placeholder: "5字の語句を入力"
+      },
+      {
+        label: "2つ目の語句",
+        placeholder: "5字の語句を入力"
+      },
+      {
+        label: "3つ目の語句",
+        placeholder: "5字の語句を入力"
+      }
+    ],
     correctAnswer: "住民の生活、建物の保存、観光施設化",
     expectedParts: [
       "住民の生活",
@@ -243,6 +273,7 @@ let results = [];
 let participantName = "";
 let currentQuestion = null;
 let backspaceCount = 0;
+let passageTimerId = null;
 
 let isQuestionLocked = false;
 let isSubmitted = false;
@@ -258,7 +289,6 @@ const goStartBtn = document.getElementById("goStartBtn");
 const startBtn = document.getElementById("startBtn");
 
 const passageText = document.getElementById("passageText");
-const goQuestionBtn = document.getElementById("goQuestionBtn");
 
 const testPassageText = document.getElementById("testPassageText");
 
@@ -266,6 +296,7 @@ const progressText = document.getElementById("progressText");
 
 const questionEl = document.getElementById("question");
 const choiceArea = document.getElementById("choiceArea");
+const multiAnswerArea = document.getElementById("multiAnswerArea");
 const answerInput = document.getElementById("answerInput");
 const nextBtn = document.getElementById("nextBtn");
 
@@ -290,8 +321,11 @@ function startTest() {
   isQuestionLocked = false;
   isSubmitted = false;
 
+  clearPassageTimer();
+
   questionEl.style.display = "block";
   choiceArea.style.display = "block";
+  multiAnswerArea.style.display = "none";
   answerInput.style.display = "inline-block";
   nextBtn.style.display = "block";
   nextBtn.disabled = false;
@@ -304,12 +338,31 @@ function startTest() {
   testPassageText.textContent = passage;
 
   startScreen.style.display = "none";
-  passageScreen.style.display = "block";
+  passageScreen.style.display = "flex";
+
+  startPassageTimer();
+}
+
+function startPassageTimer() {
+  clearPassageTimer();
+
+  passageTimerId = setTimeout(() => {
+    goToQuestionScreen();
+  }, PASSAGE_READING_TIME_MS);
+}
+
+function clearPassageTimer() {
+  if (passageTimerId !== null) {
+    clearTimeout(passageTimerId);
+    passageTimerId = null;
+  }
 }
 
 function goToQuestionScreen() {
+  clearPassageTimer();
+
   passageScreen.style.display = "none";
-  testScreen.style.display = "block";
+  testScreen.style.display = "flex";
 
   showQuestion();
 }
@@ -319,8 +372,10 @@ function generateQuestion() {
 
   return {
     type: q.type,
+    multiInputMode: q.multiInputMode || "ordered",
     questionText: q.questionText,
     choices: q.choices || [],
+    inputFields: q.inputFields || [],
     inputPlaceholder: q.inputPlaceholder || "答えを入力",
     correctAnswer: q.correctAnswer,
     answerAliases: q.answerAliases || [],
@@ -341,8 +396,6 @@ function showQuestion() {
   nextBtn.style.display = "block";
   submitArea.style.display = "none";
 
-  answerInput.value = "";
-
   backspaceCount = 0;
   startTime = performance.now();
 
@@ -351,18 +404,32 @@ function showQuestion() {
 
   if (currentQuestion.type === "input") {
     answerInput.focus();
+  } else if (currentQuestion.type === "multiInput") {
+    const firstMultiInput = document.querySelector(".multiAnswerInput");
+    if (firstMultiInput) {
+      firstMultiInput.focus();
+    }
   }
 }
 
 function renderQuestionInput(question) {
   choiceArea.innerHTML = "";
+  multiAnswerArea.innerHTML = "";
+  answerInput.value = "";
 
   if (question.type === "choice") {
     choiceArea.style.display = "block";
+    multiAnswerArea.style.display = "none";
     answerInput.style.display = "none";
     renderChoices(question.choices);
+  } else if (question.type === "multiInput") {
+    choiceArea.style.display = "none";
+    multiAnswerArea.style.display = "block";
+    answerInput.style.display = "none";
+    renderMultiInputs(question.inputFields);
   } else {
     choiceArea.style.display = "none";
+    multiAnswerArea.style.display = "none";
     answerInput.style.display = "inline-block";
     answerInput.placeholder = question.inputPlaceholder;
   }
@@ -393,6 +460,41 @@ function renderChoices(choices) {
   });
 }
 
+function renderMultiInputs(inputFields) {
+  multiAnswerArea.innerHTML = "";
+
+  inputFields.forEach((field, index) => {
+    const fieldWrap = document.createElement("div");
+    fieldWrap.className = "multiAnswerField";
+
+    const label = document.createElement("label");
+    label.className = "multiAnswerLabel";
+    label.textContent = field.label;
+    label.setAttribute("for", `multiAnswerInput${index + 1}`);
+
+    const input = document.createElement("input");
+    input.id = `multiAnswerInput${index + 1}`;
+    input.className = "multiAnswerInput";
+    input.type = "text";
+    input.autocomplete = "off";
+    input.placeholder = field.placeholder;
+
+    input.addEventListener("keydown", event => {
+      if (event.key === "Backspace") {
+        backspaceCount++;
+      }
+
+      if (event.key === "Enter") {
+        nextQuestion();
+      }
+    });
+
+    fieldWrap.appendChild(label);
+    fieldWrap.appendChild(input);
+    multiAnswerArea.appendChild(fieldWrap);
+  });
+}
+
 function updateProgress() {
   const answeredCount = currentIndex;
   progressText.textContent = `回答数：${answeredCount} / ${totalQuestions}`;
@@ -420,7 +522,34 @@ function normalizeAnswer(value) {
     .replace(/[（）()「」『』【】\[\]]/g, "");
 }
 
-function isCorrectAnswer(userAnswer, question) {
+function getMultiAnswerValues() {
+  const inputs = document.querySelectorAll(".multiAnswerInput");
+
+  return Array.from(inputs).map(input => {
+    return input.value.trim();
+  });
+}
+
+function isCorrectMultiInput(userAnswerValues, question) {
+  const normalizedUserValues = userAnswerValues.map(value => normalizeAnswer(value));
+  const normalizedExpectedParts = question.expectedParts.map(part => normalizeAnswer(part));
+
+  if (question.multiInputMode === "unordered") {
+    return normalizedExpectedParts.every(expectedPart => {
+      return normalizedUserValues.includes(expectedPart);
+    });
+  }
+
+  return normalizedExpectedParts.every((expectedPart, index) => {
+    return normalizedUserValues[index] === expectedPart;
+  });
+}
+
+function isCorrectAnswer(userAnswer, question, userAnswerValues = []) {
+  if (question.type === "multiInput") {
+    return isCorrectMultiInput(userAnswerValues, question);
+  }
+
   const normalizedUserAnswer = normalizeAnswer(userAnswer);
 
   if (question.expectedParts && question.expectedParts.length > 0) {
@@ -439,17 +568,40 @@ function isCorrectAnswer(userAnswer, question) {
   });
 }
 
+function getUserAnswer() {
+  if (currentQuestion.type === "multiInput") {
+    const values = getMultiAnswerValues();
+
+    return values.join("、");
+  }
+
+  return answerInput.value.trim();
+}
+
+function isAnswerEmpty() {
+  if (currentQuestion.type === "multiInput") {
+    const values = getMultiAnswerValues();
+
+    return values.some(value => value === "");
+  }
+
+  return answerInput.value.trim() === "";
+}
+
 function nextQuestion() {
   if (isQuestionLocked) {
     return;
   }
 
-  const userAnswer = answerInput.value.trim();
-
-  if (userAnswer === "") {
+  if (isAnswerEmpty()) {
     alert("答えを入力してください");
     return;
   }
+
+  const userAnswer = getUserAnswer();
+  const userAnswerValues = currentQuestion.type === "multiInput"
+    ? getMultiAnswerValues()
+    : [];
 
   isQuestionLocked = true;
   nextBtn.disabled = true;
@@ -457,7 +609,7 @@ function nextQuestion() {
   const endTime = performance.now();
   const elapsedTime = endTime - startTime;
 
-  const correct = isCorrectAnswer(userAnswer, currentQuestion);
+  const correct = isCorrectAnswer(userAnswer, currentQuestion, userAnswerValues);
 
   results.push({
     questionNumber: currentIndex + 1,
@@ -482,6 +634,7 @@ function showSubmitScreen() {
 
   questionEl.style.display = "none";
   choiceArea.style.display = "none";
+  multiAnswerArea.style.display = "none";
   answerInput.style.display = "none";
   nextBtn.style.display = "none";
 
@@ -607,8 +760,6 @@ nameInput.addEventListener("keydown", event => {
 });
 
 startBtn.addEventListener("click", startTest);
-
-goQuestionBtn.addEventListener("click", goToQuestionScreen);
 
 nextBtn.addEventListener("click", nextQuestion);
 
