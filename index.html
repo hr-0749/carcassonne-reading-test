@@ -18,6 +18,15 @@
       autocomplete="off"
     >
 
+    <select id="progressModeSelect">
+      <option value="none">回答数を表示しない</option>
+      <option value="text">回答数を表示</option>
+      <option value="bar">バーで表示</option>
+      <option value="both">回答数とバーの両方</option>
+      <option value="circle">回転バーで表示</option>
+      <option value="circleBoth">回答数と回転バーの両方</option>
+    </select>
+
     <button id="goStartBtn">次へ</button>
   </div>
 
@@ -48,6 +57,17 @@
 
       <div id="questionArea">
         <div id="progressText"></div>
+
+        <div id="progressBarWrap">
+          <div id="progressBar"></div>
+        </div>
+
+        <div id="circleProgressWrap">
+          <svg id="circleProgress" viewBox="0 0 120 120">
+            <circle id="circleBg" cx="60" cy="60" r="45"></circle>
+            <circle id="circleFg" cx="60" cy="60" r="45"></circle>
+          </svg>
+        </div>
 
         <div id="questionCard">
           <div id="question"></div>
