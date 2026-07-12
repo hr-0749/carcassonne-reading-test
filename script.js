@@ -1,6 +1,14 @@
 const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyol21K7nF7oQYlGAUgOGF4hUqQ5ygeCfCMoD3ypjjv_GEYMdxV5FJmZTJBdWLvdcKH-w/exec";
 
-const PASSAGE_READING_TIME_MS = 3 * 1000;
+/*
+  本文を読む時間です。
+
+  現在は動作確認用として3秒に設定しています。
+  本番で3分にする場合は、次のように変更してください。
+
+  const PASSAGE_READING_TIME_MS = 3 * 60 * 1000;
+*/
+const PASSAGE_READING_TIME_MS = 2 * 60 * 1000;
 
 const passage = `フランス南部にあるカルカソンヌ城塞都市は、ヨーロッパでも特に保存状態のよい中世の城塞都市として知られている。現在のカルカソンヌには、約3kmにおよぶ城壁と52の塔が残されており、外側と内側の二重の城壁が町を取り囲んでいる。このような構造は、単に町の周囲を石で囲んだだけのものではない。敵が外側の城壁を突破したとしても、すぐに町の中心部へ入れるわけではなく、内側の城壁との間で動きを制限される。つまり、カルカソンヌの防御は「一度防ぐ」ためだけではなく、「突破された後も敵を遅らせ、混乱させる」ことを考えた仕組みであった。
 
@@ -275,7 +283,11 @@ let results = [];
 let participantName = "";
 let currentQuestion = null;
 let backspaceCount = 0;
+
 let passageTimerId = null;
+let passageCountdownId = null;
+let passageEndTime = null;
+let hasMovedToQuestionScreen = false;
 
 let isQuestionLocked = false;
 let isSubmitted = false;
@@ -292,6 +304,7 @@ const goStartBtn = document.getElementById("goStartBtn");
 const startBtn = document.getElementById("startBtn");
 
 const passageText = document.getElementById("passageText");
+const passageCountdown = document.getElementById("passageCountdown");
 
 const testPassageText = document.getElementById("testPassageText");
 
@@ -332,6 +345,35 @@ function roundSecFromMs(ms) {
   return Number((ms / 1000).toFixed(3));
 }
 
+function formatRemainingTime(remainingMs) {
+  const totalSeconds = Math.max(
+    0,
+    Math.ceil(remainingMs / 1000)
+  );
+
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
+}
+
+function updatePassageCountdown() {
+  if (passageEndTime === null) {
+    passageCountdown.textContent =
+      `残り時間：${formatRemainingTime(PASSAGE_READING_TIME_MS)}`;
+    return;
+  }
+
+  const remainingMs = passageEndTime - Date.now();
+
+  passageCountdown.textContent =
+    `残り時間：${formatRemainingTime(remainingMs)}`;
+
+  if (remainingMs <= 0) {
+    goToQuestionScreen();
+  }
+}
+
 function goToStartScreen() {
   participantName = nameInput.value.trim();
 
@@ -352,6 +394,7 @@ function startTest() {
   results = [];
   isQuestionLocked = false;
   isSubmitted = false;
+  hasMovedToQuestionScreen = false;
 
   clearPassageTimer();
 
@@ -369,6 +412,9 @@ function startTest() {
   passageText.textContent = passage;
   testPassageText.textContent = passage;
 
+  passageCountdown.textContent =
+    `残り時間：${formatRemainingTime(PASSAGE_READING_TIME_MS)}`;
+
   startScreen.style.display = "none";
   passageScreen.style.display = "flex";
 
@@ -377,6 +423,14 @@ function startTest() {
 
 function startPassageTimer() {
   clearPassageTimer();
+
+  passageEndTime = Date.now() + PASSAGE_READING_TIME_MS;
+
+  updatePassageCountdown();
+
+  passageCountdownId = setInterval(() => {
+    updatePassageCountdown();
+  }, 250);
 
   passageTimerId = setTimeout(() => {
     goToQuestionScreen();
@@ -388,9 +442,26 @@ function clearPassageTimer() {
     clearTimeout(passageTimerId);
     passageTimerId = null;
   }
+
+  if (passageCountdownId !== null) {
+    clearInterval(passageCountdownId);
+    passageCountdownId = null;
+  }
+
+  passageEndTime = null;
 }
 
 function goToQuestionScreen() {
+  if (hasMovedToQuestionScreen) {
+    return;
+  }
+
+  hasMovedToQuestionScreen = true;
+
+  if (passageCountdown) {
+    passageCountdown.textContent = "残り時間：0:00";
+  }
+
   clearPassageTimer();
 
   passageScreen.style.display = "none";
@@ -437,7 +508,9 @@ function showQuestion() {
   if (currentQuestion.type === "input") {
     answerInput.focus();
   } else if (currentQuestion.type === "multiInput") {
-    const firstMultiInput = document.querySelector(".multiAnswerInput");
+    const firstMultiInput =
+      document.querySelector(".multiAnswerInput");
+
     if (firstMultiInput) {
       firstMultiInput.focus();
     }
@@ -472,6 +545,7 @@ function renderChoices(choices) {
 
   choices.forEach((choice, index) => {
     const button = document.createElement("button");
+
     button.type = "button";
     button.className = "choiceBtn";
     button.dataset.value = choice.value;
@@ -480,7 +554,9 @@ function renderChoices(choices) {
     button.addEventListener("click", () => {
       answerInput.value = choice.value;
 
-      const allChoiceButtons = document.querySelectorAll(".choiceBtn");
+      const allChoiceButtons =
+        document.querySelectorAll(".choiceBtn");
+
       allChoiceButtons.forEach(btn => {
         btn.classList.remove("selectedChoice");
       });
@@ -502,7 +578,10 @@ function renderMultiInputs(inputFields) {
     const label = document.createElement("label");
     label.className = "multiAnswerLabel";
     label.textContent = field.label;
-    label.setAttribute("for", `multiAnswerInput${index + 1}`);
+    label.setAttribute(
+      "for",
+      `multiAnswerInput${index + 1}`
+    );
 
     const input = document.createElement("input");
     input.id = `multiAnswerInput${index + 1}`;
@@ -531,12 +610,14 @@ function updateProgress() {
   const answeredCount = currentIndex;
   const percent = answeredCount / totalQuestions;
 
-  progressText.textContent = `回答数：${answeredCount} / ${totalQuestions}`;
+  progressText.textContent =
+    `回答数：${answeredCount} / ${totalQuestions}`;
 
   progressBar.style.width = `${percent * 100}%`;
 
   circleFg.style.strokeDasharray = circleLength;
-  circleFg.style.strokeDashoffset = circleLength * (1 - percent);
+  circleFg.style.strokeDashoffset =
+    circleLength * (1 - percent);
 
   progressText.style.display = "none";
   progressBarWrap.style.display = "none";
@@ -560,10 +641,14 @@ function updateProgress() {
 function toHalfWidth(value) {
   return String(value)
     .replace(/[０-９]/g, char => {
-      return String.fromCharCode(char.charCodeAt(0) - 0xFEE0);
+      return String.fromCharCode(
+        char.charCodeAt(0) - 0xFEE0
+      );
     })
     .replace(/[Ａ-Ｚａ-ｚ]/g, char => {
-      return String.fromCharCode(char.charCodeAt(0) - 0xFEE0);
+      return String.fromCharCode(
+        char.charCodeAt(0) - 0xFEE0
+      );
     });
 }
 
@@ -579,7 +664,8 @@ function normalizeAnswer(value) {
 }
 
 function getMultiAnswerValues() {
-  const inputs = document.querySelectorAll(".multiAnswerInput");
+  const inputs =
+    document.querySelectorAll(".multiAnswerInput");
 
   return Array.from(inputs).map(input => {
     return input.value.trim();
@@ -587,8 +673,11 @@ function getMultiAnswerValues() {
 }
 
 function isCorrectMultiInput(userAnswerValues, question) {
-  const normalizedUserValues = userAnswerValues.map(value => normalizeAnswer(value));
-  const normalizedExpectedParts = question.expectedParts.map(part => normalizeAnswer(part));
+  const normalizedUserValues =
+    userAnswerValues.map(value => normalizeAnswer(value));
+
+  const normalizedExpectedParts =
+    question.expectedParts.map(part => normalizeAnswer(part));
 
   if (question.multiInputMode === "unordered") {
     return normalizedExpectedParts.every(expectedPart => {
@@ -596,21 +685,36 @@ function isCorrectMultiInput(userAnswerValues, question) {
     });
   }
 
-  return normalizedExpectedParts.every((expectedPart, index) => {
-    return normalizedUserValues[index] === expectedPart;
-  });
+  return normalizedExpectedParts.every(
+    (expectedPart, index) => {
+      return normalizedUserValues[index] === expectedPart;
+    }
+  );
 }
 
-function isCorrectAnswer(userAnswer, question, userAnswerValues = []) {
+function isCorrectAnswer(
+  userAnswer,
+  question,
+  userAnswerValues = []
+) {
   if (question.type === "multiInput") {
-    return isCorrectMultiInput(userAnswerValues, question);
+    return isCorrectMultiInput(
+      userAnswerValues,
+      question
+    );
   }
 
-  const normalizedUserAnswer = normalizeAnswer(userAnswer);
+  const normalizedUserAnswer =
+    normalizeAnswer(userAnswer);
 
-  if (question.expectedParts && question.expectedParts.length > 0) {
+  if (
+    question.expectedParts &&
+    question.expectedParts.length > 0
+  ) {
     return question.expectedParts.every(part => {
-      return normalizedUserAnswer.includes(normalizeAnswer(part));
+      return normalizedUserAnswer.includes(
+        normalizeAnswer(part)
+      );
     });
   }
 
@@ -620,7 +724,8 @@ function isCorrectAnswer(userAnswer, question, userAnswerValues = []) {
   ];
 
   return acceptableAnswers.some(answer => {
-    return normalizedUserAnswer === normalizeAnswer(answer);
+    return normalizedUserAnswer ===
+      normalizeAnswer(answer);
   });
 }
 
@@ -655,9 +760,11 @@ function nextQuestion() {
   }
 
   const userAnswer = getUserAnswer();
-  const userAnswerValues = currentQuestion.type === "multiInput"
-    ? getMultiAnswerValues()
-    : [];
+
+  const userAnswerValues =
+    currentQuestion.type === "multiInput"
+      ? getMultiAnswerValues()
+      : [];
 
   isQuestionLocked = true;
   nextBtn.disabled = true;
@@ -665,7 +772,11 @@ function nextQuestion() {
   const endTime = performance.now();
   const elapsedTime = endTime - startTime;
 
-  const correct = isCorrectAnswer(userAnswer, currentQuestion, userAnswerValues);
+  const correct = isCorrectAnswer(
+    userAnswer,
+    currentQuestion,
+    userAnswerValues
+  );
 
   results.push({
     questionNumber: currentIndex + 1,
@@ -712,7 +823,9 @@ function finishTest() {
 }
 
 function countCorrect(targetResults) {
-  return targetResults.filter(result => result.isCorrect).length;
+  return targetResults.filter(result => {
+    return result.isCorrect;
+  }).length;
 }
 
 function sumTimeMs(targetResults) {
@@ -731,30 +844,49 @@ function createOneRowResult() {
   for (let i = 0; i < totalQuestions; i++) {
     const result = results[i];
 
-    oneRowResult[`q${i + 1}Answer`] = result ? result.userAnswer : "";
-    oneRowResult[`q${i + 1}Correct`] = result
-      ? (result.isCorrect ? "正" : "誤")
-      : "";
-    oneRowResult[`q${i + 1}TimeSec`] = result
-      ? roundSecFromMs(result.timeMs)
-      : "";
+    oneRowResult[`q${i + 1}Answer`] =
+      result ? result.userAnswer : "";
+
+    oneRowResult[`q${i + 1}Correct`] =
+      result
+        ? (result.isCorrect ? "正" : "誤")
+        : "";
+
+    oneRowResult[`q${i + 1}TimeSec`] =
+      result
+        ? roundSecFromMs(result.timeMs)
+        : "";
   }
 
   const firstHalfResults = results.slice(0, 5);
   const secondHalfResults = results.slice(5, 10);
 
-  const totalAnswerTimeMs = sumTimeMs(results);
-  const firstHalfAnswerTimeMs = sumTimeMs(firstHalfResults);
-  const secondHalfAnswerTimeMs = sumTimeMs(secondHalfResults);
+  const totalAnswerTimeMs =
+    sumTimeMs(results);
 
-  oneRowResult.correctCount = countCorrect(results);
-  oneRowResult.totalAnswerTimeSec = roundSecFromMs(totalAnswerTimeMs);
+  const firstHalfAnswerTimeMs =
+    sumTimeMs(firstHalfResults);
 
-  oneRowResult.firstHalfCorrectCount = countCorrect(firstHalfResults);
-  oneRowResult.secondHalfCorrectCount = countCorrect(secondHalfResults);
+  const secondHalfAnswerTimeMs =
+    sumTimeMs(secondHalfResults);
 
-  oneRowResult.firstHalfAnswerTimeSec = roundSecFromMs(firstHalfAnswerTimeMs);
-  oneRowResult.secondHalfAnswerTimeSec = roundSecFromMs(secondHalfAnswerTimeMs);
+  oneRowResult.correctCount =
+    countCorrect(results);
+
+  oneRowResult.totalAnswerTimeSec =
+    roundSecFromMs(totalAnswerTimeMs);
+
+  oneRowResult.firstHalfCorrectCount =
+    countCorrect(firstHalfResults);
+
+  oneRowResult.secondHalfCorrectCount =
+    countCorrect(secondHalfResults);
+
+  oneRowResult.firstHalfAnswerTimeSec =
+    roundSecFromMs(firstHalfAnswerTimeMs);
+
+  oneRowResult.secondHalfAnswerTimeSec =
+    roundSecFromMs(secondHalfAnswerTimeMs);
 
   return oneRowResult;
 }
@@ -779,14 +911,17 @@ async function sendResultsToSpreadsheet() {
     });
 
     sendBtn.textContent = "送信済み";
-    alert("テスト終了。結果を送信しました。");
+    alert("テスト終了。結果を送信しました.");
 
   } catch (error) {
     isSubmitted = false;
     sendBtn.disabled = false;
     sendBtn.textContent = "送信";
 
-    alert("送信に失敗しました。予備としてCSVを保存します。");
+    alert(
+      "送信に失敗しました。予備としてCSVを保存します。"
+    );
+
     downloadCSV();
   }
 }
@@ -825,9 +960,17 @@ function downloadCSV() {
     headers.push(`${i}問目の正誤`);
     headers.push(`${i}問目の回答時間_秒`);
 
-    values.push(`"${escapeCSV(oneRowResult[`q${i}Answer`])}"`);
-    values.push(`"${escapeCSV(oneRowResult[`q${i}Correct`])}"`);
-    values.push(oneRowResult[`q${i}TimeSec`]);
+    values.push(
+      `"${escapeCSV(oneRowResult[`q${i}Answer`])}"`
+    );
+
+    values.push(
+      `"${escapeCSV(oneRowResult[`q${i}Correct`])}"`
+    );
+
+    values.push(
+      oneRowResult[`q${i}TimeSec`]
+    );
   }
 
   const csv =
@@ -838,22 +981,32 @@ function downloadCSV() {
 
   const blob = new Blob(
     ["\uFEFF" + csv],
-    { type: "text/csv" }
+    {
+      type: "text/csv"
+    }
   );
 
   const url = URL.createObjectURL(blob);
 
-  const safeName = participantName.replace(/[\\/:*?"<>|]/g, "_");
+  const safeName = participantName.replace(
+    /[\\/:*?"<>|]/g,
+    "_"
+  );
 
   const a = document.createElement("a");
   a.href = url;
-  a.download = `${safeName}_reading_test_results.csv`;
+  a.download =
+    `${safeName}_reading_test_results.csv`;
+
   a.click();
 
   URL.revokeObjectURL(url);
 }
 
-goStartBtn.addEventListener("click", goToStartScreen);
+goStartBtn.addEventListener(
+  "click",
+  goToStartScreen
+);
 
 nameInput.addEventListener("keydown", event => {
   if (event.key === "Enter") {
@@ -861,11 +1014,20 @@ nameInput.addEventListener("keydown", event => {
   }
 });
 
-startBtn.addEventListener("click", startTest);
+startBtn.addEventListener(
+  "click",
+  startTest
+);
 
-nextBtn.addEventListener("click", nextQuestion);
+nextBtn.addEventListener(
+  "click",
+  nextQuestion
+);
 
-sendBtn.addEventListener("click", finishTest);
+sendBtn.addEventListener(
+  "click",
+  finishTest
+);
 
 answerInput.addEventListener("keydown", event => {
   if (event.key === "Backspace") {
