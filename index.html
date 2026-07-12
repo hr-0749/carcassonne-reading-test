@@ -39,8 +39,16 @@
     <h1>本文</h1>
 
     <p id="passageNotice">
-      本文を読んでください。3分後に自動で問題画面へ進みます。
+      本文を読んでください。時間になると自動で問題画面へ進みます。
     </p>
+
+    <div
+      id="passageCountdown"
+      role="timer"
+      aria-live="polite"
+    >
+      残り時間：--:--
+    </div>
 
     <div id="passageBox">
       <p id="passageText"></p>
