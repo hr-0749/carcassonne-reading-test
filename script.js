@@ -25,7 +25,7 @@ const passage = `フランス南部にあるカルカソンヌ城塞都市は、
 const questions = [
   {
     type: "choice",
-    questionText: `問1　本文内容の理解
+    questionText: `問1
 
 カルカソンヌ城塞都市の特徴として、本文の内容に最も合うものを1つ選びなさい。`,
     choices: [
@@ -51,7 +51,7 @@ const questions = [
   },
   {
     type: "choice",
-    questionText: `問2　防御構造の理解
+    questionText: `問2
 
 本文によると、カルカソンヌの二重城壁にはどのような利点があったと考えられるか。最も適切なものを1つ選びなさい。`,
     choices: [
@@ -77,7 +77,7 @@ const questions = [
   },
   {
     type: "input",
-    questionText: `問3　語句抜き出し
+    questionText: `問3
 
 本文では、カルカソンヌは軍事的な拠点であると同時に、どのような場所でもあったと述べられているか。
 本文中から6字で抜き出しなさい。`,
@@ -87,7 +87,7 @@ const questions = [
   },
   {
     type: "choice",
-    questionText: `問4　空欄補充
+    questionText: `問4
 
 次の文の空欄に入る語句として最も適切なものを選びなさい。
 
@@ -115,7 +115,7 @@ const questions = [
   },
   {
     type: "choice",
-    questionText: `問5　本文からの推論
+    questionText: `問5
 
 本文では、カルカソンヌは「単なる壁に囲まれた町」ではないと説明されている。その理由として最も適切なものを1つ選びなさい。`,
     choices: [
@@ -141,7 +141,7 @@ const questions = [
   },
   {
     type: "choice",
-    questionText: `問6　正誤判断
+    questionText: `問6
 
 本文の内容と誤っているものを選びなさい。`,
     choices: [
@@ -167,7 +167,7 @@ const questions = [
   },
   {
     type: "choice",
-    questionText: `問7　並び変え問題
+    questionText: `問7
 
 本文の流れに合うように、次の内容を古い順に並べ変えたとき、３番目に来るものを選びなさい。`,
     choices: [
@@ -193,7 +193,7 @@ const questions = [
   },
   {
     type: "choice",
-    questionText: `問8　やや難しい推論問題
+    questionText: `問8
 
 本文では、城壁が「住民や周辺地域に対して支配者の力を見せる役割も果たした」と述べられている。
 このように考えられる理由として、最も適切なものを1つ選びなさい。`,
@@ -221,7 +221,7 @@ const questions = [
   {
     type: "multiInput",
     multiInputMode: "ordered",
-    questionText: `問9　語句抜き出し
+    questionText: `問9
 
 19世紀の修復によって、カルカソンヌは中世城塞都市らしい姿を取り戻した。
 一方で、現在見られる姿について、本文ではどの2つを区別することが問題になったと述べられているか。
@@ -246,7 +246,7 @@ const questions = [
   {
     type: "multiInput",
     multiInputMode: "unordered",
-    questionText: `問10　語句抜き出し
+    questionText: `問10
 
 現在のカルカソンヌでは、多くの観光客が訪れることで、いくつかの要素のバランスを取る必要があると述べられている。
 本文中から、その3つの要素をそれぞれ5字で抜き出しなさい。（順不同）`,
